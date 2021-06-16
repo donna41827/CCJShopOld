@@ -40,21 +40,27 @@
             <label asp-for="ProductColorList.FirstOrDefault().ColorCode" class="control-label"></label>
             <input type="button" id="addColor" class="btn btn-link AddColor" value="新增顏色" onclick="addColorFunc()" /><br>
             <div class="ColorArea row" id="ColorArea">
-                <div class="ColorItem col-6">
-                    <input type="color" name="favcolor" value="#80A6FF">
-                    <input type="button" class="btn btn-link RemoveColor" value="刪除" onclick="RemoveColorFunc(this)" />
-                </div>
+                @foreach (ProductColor pc in Model.ProductColorList)
+                {
+                    <div class="ColorItem col-6">
+                        <input type="color" name="favcolor" value="@(pc.ColorCode)">
+                        <input type="button" class="btn btn-link RemoveColor" value="刪除" onclick="RemoveColorFunc(this)" />
+                    </div>
+                }
             </div>
         </div>
         <div class="form-group col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
             <label asp-for="ProductSizeList.FirstOrDefault().SizeCode" class="control-label"></label>
             <input type="button" id="addSize" class="btn btn-link" value="新增尺碼" onclick="addSizeFunc()" /><br>
             <div class="SizeArea" id="SizeArea">
-                <div name="SizeItem" class="SizeItem">
-                    <input type="text" name="sizeCode" placeholder="ex.M" class="sizeCode form-control">
-                    <input type="text" name="sizeMemo" placeholder="ex.腰圍60 裙長78" class="sizeMemo form-control">
-                    <input type="button" class="btn btn-link RemoveSize" value="刪除" onclick="RemoveSizeFunc(this)" />
-                </div>
+                @foreach (ProductSize ps in Model.ProductSizeList)
+                {
+                    <div name="SizeItem" class="SizeItem">
+                        <input type="text" name="sizeCode" placeholder="ex.M" class="sizeCode form-control" value="@(ps.SizeCode)">
+                        <input type="text" name="sizeMemo" placeholder="ex.腰圍60 裙長78" class="sizeMemo form-control" value="@(ps.SizeMemo)">
+                        <input type="button" class="btn btn-link RemoveSize" value="刪除" onclick="RemoveSizeFunc(this)" />
+                    </div>
+                }
             </div>
         </div>
         <div class="form-group col-12">
@@ -63,12 +69,24 @@
             <article>
                 <label for="files"></label>
                 <input id="files" type="file" multiple /><br>
-                <output id="result" />
+                <output id="result">
+                    @for (int i = 0; i < Model.ProductImgList.Count; i++)
+                    {
+                        <div id="ImgItem@(i+1)">
+                            <img name="ImgItemTag" class="thumbnail" src="@Model.ProductImgList[i].ImgName" title="undefined">
+                            <div>
+                                <input type="button" class="btn btn-link SortBack" value="排序往前" onclick="FrontImgFunc(this)">
+                                <input type="button" class="btn btn-link SortFront" value="排序往後" onclick="BackImgFunc(this)">
+                                <input type="button" class="btn btn-link RemoveImg" value="刪除" onclick="RemoveImgFunc(this)">
+                            </div>
+                        </div>
+                    }
+                </output>
             </article>
         </div>
     </div>
     <div class="form-group align-content-start">
-        <input type="button" value="修改商品" class="btn btn-primary" data-url="@Url.Action("Edit")" />@*onclick="CreateProd(this)"*@
+        <input type="button" value="修改商品" class="btn btn-primary" data-url="@Url.Action("Edit")" onclick="CreateProd(this)" />
     </div>
 </form>
 <div>
@@ -79,3 +97,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+<script src="~/js/ProductFunc.js"></script>

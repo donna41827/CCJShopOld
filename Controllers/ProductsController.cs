@@ -189,34 +189,97 @@ namespace CCJShop.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,Name,Descript,Price,Status,CDT,MDT")] Product product)
+        [Obsolete]
+        public async Task<IActionResult> Edit([FromBody] ProductViewModel productView)
         {
-            if (id != product.ProductId)
+            ReturnMsg retMsg = new ReturnMsg();
+            if (!ModelState.IsValid)
             {
-                return NotFound();
-            }
+                retMsg.Success = false;
+                retMsg.Msg = "修改失敗!資料驗證失敗!";
+                retMsg.ValidationItemList = new List<ValidationItem>();
 
-            if (ModelState.IsValid)
-            {
-                try
+                bool SizeValidation = true;//尺碼檢核Flag( true:檢核通過 false:檢核失敗(有任一筆為空就失敗) )
+
+                foreach (var item in ModelState.ToList())
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.ProductId))
+                    string errmsg = "";
+                    if (item.Key.StartsWith("ProductSizeList"))
                     {
-                        return NotFound();
+                        SizeValidation = false;
                     }
                     else
                     {
-                        throw;
+                        for (int i = 0; i < item.Value.Errors.Count; i++)
+                        {
+                            errmsg += item.Value.Errors[i].ErrorMessage;
+                            if (i != 0) errmsg += "<br>";
+                        }
+                        retMsg.ValidationItemList.Add(new ValidationItem { Key = item.Key.ToString(), Msg = errmsg });
                     }
                 }
-                return RedirectToAction(nameof(Index));
+
+                //尺碼驗證失敗增加一筆尺碼失敗訊息
+                if (!SizeValidation)
+                {
+                    retMsg.ValidationItemList.Add(new ValidationItem { Key = "ProductSizeList", Msg = "<br>尺碼不可為空，請刪除或填寫資料" });
+                }
+
+                return Json(new { ret = retMsg });
             }
-            return View(product);
+            try
+            {
+                //Product p = new Product();
+                //p = productView.Product;
+                //p.CDT = DateTime.Now;
+                //p.MDT = DateTime.Now;
+                //p.ProductColor = new List<ProductColor>();
+                //p.ProductSize = new List<ProductSize>();
+                //p.ProductImg = new List<ProductImg>();
+
+                //foreach (ProductColor pc in productView.ProductColorList)
+                //{
+                //    pc.CDT = DateTime.Now;
+                //    pc.MDT = DateTime.Now;
+                //    p.ProductColor.Add(pc);
+                //}
+
+                //foreach (ProductSize ps in productView.ProductSizeList)
+                //{
+                //    ps.CDT = DateTime.Now;
+                //    ps.MDT = DateTime.Now;
+                //    p.ProductSize.Add(ps);
+                //}
+
+                //foreach (ProductImg pm in productView.ProductImgList)
+                //{
+                //    string fileName = "";
+                //    string PathStr = "";
+                //    if (!SaveImage(pm.ImgName, ref fileName, ref PathStr))
+                //    {
+                //        throw new Exception("圖片儲存失敗!");
+                //    }
+                //    ProductImg newPm = new ProductImg();
+                //    newPm.CDT = DateTime.Now;
+                //    newPm.MDT = DateTime.Now;
+                //    newPm.ImgName = fileName;
+                //    newPm.ImgPath = PathStr;
+                //    newPm.ProductColorId = 0;
+                //    p.ProductImg.Add(newPm);
+                //}
+
+                //_context.Product.Add(p);
+                //await _context.SaveChangesAsync();
+                retMsg.Success = true;
+                retMsg.Msg = "修改成功!";
+                return Json(new { ret = retMsg });
+            }
+            catch (Exception ex)
+            {
+                retMsg.Success = false;
+                retMsg.Msg = "修改失敗:" + ex.Message.ToString();
+                return Json(new { ret = retMsg });
+            }
         }
 
         // GET: Products/Delete/5

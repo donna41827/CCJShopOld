@@ -1,0 +1,15 @@
+﻿@model CCJShop.Models.ReturnMsg
+
+@{
+    ViewData["Title"] = "刪除商品";
+}
+
+<div>
+    <h4>刪除商品</h4>
+    <hr />
+    <div>
+        @Html.Raw(Model.Msg)
+    </div>
+    <br>
+    <a asp-action="Index">回商品列表</a>
+</div>

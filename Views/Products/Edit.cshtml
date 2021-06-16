@@ -1,0 +1,81 @@
+﻿@model CCJShop.Models.ProductViewModel;
+
+@{
+    ViewData["Title"] = "編輯商品";
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<h4>編輯商品</h4>
+<hr />
+<form>
+    <div class="row">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Product.ProductId" />
+        <div class="form-group col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
+            <label asp-for="Product.Name" class="control-label"></label>
+            <input asp-for="Product.Name" class="form-control" />
+            <span asp-validation-for="Product.Name" class="text-danger"></span>
+        </div>
+        <div class="form-group col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
+            <label asp-for="Product.Price" class="control-label"></label>
+            <input asp-for="Product.Price" class="form-control" />
+            <span asp-validation-for="Product.Price" class="text-danger"></span>
+        </div>
+        <div class="form-group col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
+            <label asp-for="Product.Status" class="control-label"></label>
+            <select asp-for="Product.Status" asp-items="Html.GetEnumSelectList<Status>()" class="form-control"></select>
+            <span asp-validation-for="Product.Status" class="text-danger"></span>
+        </div>
+        <div class="form-group col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
+            <label asp-for="Product.Memo" class="control-label"></label>
+            <textarea asp-for="Product.Memo" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Product.Memo" class="text-danger"></span>
+        </div>
+        <div class="form-group col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
+            <label asp-for="ProductColorList.FirstOrDefault().ColorCode" class="control-label"></label>
+            <input type="button" id="addColor" class="btn btn-link AddColor" value="新增顏色" onclick="addColorFunc()" /><br>
+            <div class="ColorArea row" id="ColorArea">
+                <div class="ColorItem col-6">
+                    <input type="color" name="favcolor" value="#80A6FF">
+                    <input type="button" class="btn btn-link RemoveColor" value="刪除" onclick="RemoveColorFunc(this)" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
+            <label asp-for="ProductSizeList.FirstOrDefault().SizeCode" class="control-label"></label>
+            <input type="button" id="addSize" class="btn btn-link" value="新增尺碼" onclick="addSizeFunc()" /><br>
+            <div class="SizeArea" id="SizeArea">
+                <div name="SizeItem" class="SizeItem">
+                    <input type="text" name="sizeCode" placeholder="ex.M" class="sizeCode form-control">
+                    <input type="text" name="sizeMemo" placeholder="ex.腰圍60 裙長78" class="sizeMemo form-control">
+                    <input type="button" class="btn btn-link RemoveSize" value="刪除" onclick="RemoveSizeFunc(this)" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-12">
+            <label class="control-label">商品圖片</label>
+            <span asp-validation-for="ProductImgList" class="text-danger"></span>
+            <article>
+                <label for="files"></label>
+                <input id="files" type="file" multiple /><br>
+                <output id="result" />
+            </article>
+        </div>
+    </div>
+    <div class="form-group align-content-start">
+        <input type="button" value="修改商品" class="btn btn-primary" data-url="@Url.Action("Edit")" />@*onclick="CreateProd(this)"*@
+    </div>
+</form>
+<div>
+    <a asp-action="Index">回商品列表</a>
+</div>
+<input type="hidden" id="RequestVerificationToken" name="RequestVerificationToken" value="@GetAntiXsrfRequestToken()">
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

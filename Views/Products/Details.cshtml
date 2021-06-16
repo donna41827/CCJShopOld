@@ -1,0 +1,118 @@
+﻿@model CCJShop.Models.ProductViewModel
+
+@{
+    ViewData["Title"] = "商品明細";
+}
+
+<div>
+    <h4>商品明細</h4>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Product.ProductId">Edit</a> |
+        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#myModal@(Model.Product.ProductId)" style="color:red">刪除</button> | 
+        <hr />
+        <div class="row align-items-start">
+            <div class="ProdDetail .col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div id="carouselExampleIndicators@(Model.Product.ProductId)" class="carousel slide" data-ride="carousel" data-interval="false">
+                    <ol class="carousel-indicators">
+                        @for (int i = 0; i < Model.ProductImgList.Count; i++)
+                        {
+                            <li data-target="#carouselExampleIndicators@(Model.Product.ProductId)" data-slide-to="0" class="@(i == 0 ? "active" : "")"></li>
+                        }
+                    </ol>
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < Model.ProductImgList.Count; i++)
+                        {
+                            <div class="img-wrap carousel-item @(i == 0 ? "active" : "") ">
+                                <img class="d-block w-100 ProdImg" src="@(Model.ProductImgList[i].ImgPath)@(Model.ProductImgList[i].ImgName)">
+                            </div>
+                        }
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselExampleIndicators@(Model.Product.ProductId)" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleIndicators@(Model.Product.ProductId)" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+            <div class="ProdDetail .col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                <h4>@(Model.Product.Name)</h4>
+                <br>
+                <h5>
+                    $@(Model.Product.Price)
+                </h5>
+                <br>
+                <p>
+                    @Html.Raw(Model.Product.Memo)
+                </p>
+                <p>
+                    @foreach (var Sizeitem in Model.ProductSizeList)
+                    {
+                        <div>
+                            @Sizeitem.SizeCode : @Sizeitem.SizeMemo
+                        </div>
+                    }
+                </p>
+                <p>
+                    <div class="ProdColor">
+                        @foreach (var ColorItem in Model.ProductColorList)
+                        {
+                            <div class="ProdColorSquare" style="background-color:@(ColorItem.ColorCode)">
+                            </div>
+
+                        }
+                    </div>
+                </p>
+                <p>
+                    <div>
+                        @foreach (var SizeItem in Model.ProductSizeList)
+                        {
+                            <div class="ProdColorSquare">@(SizeItem.SizeCode)</div>
+                        }
+                    </div>
+                </p>
+                <p>
+                    <div>
+                        <!--<div class="qtyNum">-->
+                        @*<button type="button">-</button>*@
+                        <!--<input type="number" value="1" max="9" min="1"/>-->
+                        @*<button type="button">+</button>*@
+                        <!--</div>-->
+                        <div class="number-input">
+                            <button onclick="this.parentNode.querySelector('input[type=number]').stepDown()"></button>
+                            <input class="quantity" min="1" name="quantity" value="1" type="number" max="10">
+                            <button onclick="this.parentNode.querySelector('input[type=number]').stepUp()" class="plus"></button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-light btnAddChart">加入購物車</button>
+                            <button type="button" class="btn btn-light btnAddChart">立即結帳</button>
+                        </div>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    @*確認刪除視窗*@
+    <div class="modal fade" id="myModal@(Model.Product.ProductId)" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">刪除商品</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    確定刪除下列商品?<hr />
+                    <h4>@(Model.Product.Name)</h4><h5>$@(Model.Product.Price)</h5>
+                </div>
+                <div class="modal-footer">
+                    <a asp-action="Delete" asp-route-Id="@(Model.Product.ProductId)" id="deleteBtn" class="btn bg-danger mr-1" style="color:white">刪除</a>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a asp-action="Index">Back to List</a>
+</div>

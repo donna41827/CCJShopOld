@@ -98,7 +98,7 @@ namespace CCJShop.Controllers
                 }
 
                 //尺碼驗證失敗增加一筆尺碼失敗訊息
-                if (!SizeValidation) 
+                if (!SizeValidation)
                 {
                     retMsg.ValidationItemList.Add(new ValidationItem { Key = "ProductSizeList", Msg = "<br>尺碼不可為空，請刪除或填寫資料" });
                 }
@@ -115,36 +115,37 @@ namespace CCJShop.Controllers
                 p.ProductSize = new List<ProductSize>();
                 p.ProductImg = new List<ProductImg>();
 
-                foreach (ProductColor pc in productView.ProductColorList)
-                {
-                    pc.CDT = DateTime.Now;
-                    pc.MDT = DateTime.Now;
-                    p.ProductColor.Add(pc);
-                }
+                AddProductDetails(productView, ref p);
+                //foreach (ProductColor pc in productView.ProductColorList)
+                //{
+                //    pc.CDT = DateTime.Now;
+                //    pc.MDT = DateTime.Now;
+                //    p.ProductColor.Add(pc);
+                //}
 
-                foreach (ProductSize ps in productView.ProductSizeList)
-                {
-                    ps.CDT = DateTime.Now;
-                    ps.MDT = DateTime.Now;
-                    p.ProductSize.Add(ps);
-                }
+                //foreach (ProductSize ps in productView.ProductSizeList)
+                //{
+                //    ps.CDT = DateTime.Now;
+                //    ps.MDT = DateTime.Now;
+                //    p.ProductSize.Add(ps);
+                //}
 
-                foreach (ProductImg pm in productView.ProductImgList)
-                {
-                    string fileName = "";
-                    string PathStr = "";
-                    if (!SaveImage(pm.ImgName, ref fileName, ref PathStr))
-                    {
-                        throw new Exception("圖片儲存失敗!");
-                    }
-                    ProductImg newPm = new ProductImg();
-                    newPm.CDT = DateTime.Now;
-                    newPm.MDT = DateTime.Now;
-                    newPm.ImgName = fileName;
-                    newPm.ImgPath = PathStr;
-                    newPm.ProductColorId = 0;
-                    p.ProductImg.Add(newPm);
-                }
+                //foreach (ProductImg pm in productView.ProductImgList)
+                //{
+                //    string fileName = "";
+                //    string PathStr = "";
+                //    if (!SaveImage(pm.ImgName, ref fileName, ref PathStr))
+                //    {
+                //        throw new Exception("圖片儲存失敗!");
+                //    }
+                //    ProductImg newPm = new ProductImg();
+                //    newPm.CDT = DateTime.Now;
+                //    newPm.MDT = DateTime.Now;
+                //    newPm.ImgName = fileName;
+                //    newPm.ImgPath = PathStr;
+                //    newPm.ProductColorId = 0;
+                //    p.ProductImg.Add(newPm);
+                //}
 
                 _context.Product.Add(p);
                 await _context.SaveChangesAsync();
@@ -173,6 +174,7 @@ namespace CCJShop.Controllers
             {
                 return NotFound();
             }
+            vm.Product.Memo = vm.Product.Memo.Replace("<br>", "\n");
             vm.ProductColorList = _context.ProductColor.Where(w => w.ProductId == id).ToList();
             vm.ProductSizeList = _context.ProductSize.Where(w => w.ProductId == id).ToList();
             vm.ProductImgList = new List<ProductImg>();
@@ -229,47 +231,26 @@ namespace CCJShop.Controllers
             }
             try
             {
-                //Product p = new Product();
-                //p = productView.Product;
-                //p.CDT = DateTime.Now;
-                //p.MDT = DateTime.Now;
-                //p.ProductColor = new List<ProductColor>();
-                //p.ProductSize = new List<ProductSize>();
-                //p.ProductImg = new List<ProductImg>();
+                int id = productView.Product.ProductId;
+                Product p = _context.Product.FirstOrDefault(f => f.ProductId == id);
 
-                //foreach (ProductColor pc in productView.ProductColorList)
-                //{
-                //    pc.CDT = DateTime.Now;
-                //    pc.MDT = DateTime.Now;
-                //    p.ProductColor.Add(pc);
-                //}
+                RemoveProductDetails(productView.Product.ProductId);
 
-                //foreach (ProductSize ps in productView.ProductSizeList)
-                //{
-                //    ps.CDT = DateTime.Now;
-                //    ps.MDT = DateTime.Now;
-                //    p.ProductSize.Add(ps);
-                //}
+                p.Name = productView.Product.Name;
+                p.Memo = productView.Product.Memo;
+                p.Price = productView.Product.Price;
+                p.Status = productView.Product.Status;
+                p.MDT = DateTime.Now;
 
-                //foreach (ProductImg pm in productView.ProductImgList)
-                //{
-                //    string fileName = "";
-                //    string PathStr = "";
-                //    if (!SaveImage(pm.ImgName, ref fileName, ref PathStr))
-                //    {
-                //        throw new Exception("圖片儲存失敗!");
-                //    }
-                //    ProductImg newPm = new ProductImg();
-                //    newPm.CDT = DateTime.Now;
-                //    newPm.MDT = DateTime.Now;
-                //    newPm.ImgName = fileName;
-                //    newPm.ImgPath = PathStr;
-                //    newPm.ProductColorId = 0;
-                //    p.ProductImg.Add(newPm);
-                //}
+                p.ProductColor = new List<ProductColor>();
+                p.ProductSize = new List<ProductSize>();
+                p.ProductImg = new List<ProductImg>();
+                AddProductDetails(productView, ref p);
 
-                //_context.Product.Add(p);
-                //await _context.SaveChangesAsync();
+                _context.Update(p);
+
+                await _context.SaveChangesAsync();
+
                 retMsg.Success = true;
                 retMsg.Msg = "修改成功!";
                 return Json(new { ret = retMsg });
@@ -302,27 +283,9 @@ namespace CCJShop.Controllers
                 }
 
                 retMsg.Msg = "<h5>" + product.Name + "</h5><p>$" + product.Price + "</p>";
-                var ProdSize = _context.ProductSize.Where(w => w.ProductId == id);
-                var ProdColor = _context.ProductColor.Where(w => w.ProductId == id);
-                var ProdImg = _context.ProductImg.Where(w => w.ProductId == id);
 
-                foreach (ProductSize ps in ProdSize)
-                {
-                    _context.ProductSize.Remove(ps);
-                }
-                foreach (ProductColor pc in ProdColor)
-                {
-                    _context.ProductColor.Remove(pc);
-                }
-                foreach (ProductImg pm in ProdImg)
-                {
-                    var fullPathFileName = hostingEnvironment.WebRootPath + pm.ImgPath.Replace("/", "\\") + pm.ImgName;
-                    if (System.IO.File.Exists(fullPathFileName))
-                    {
-                        System.IO.File.Delete(fullPathFileName);
-                    }
-                    _context.ProductImg.Remove(pm);
-                }
+                RemoveProductDetails(id);
+
                 _context.Product.Remove(product);
 
                 await _context.SaveChangesAsync();
@@ -411,5 +374,65 @@ namespace CCJShop.Controllers
                 return null;
             }
         }
+        private void RemoveProductDetails(int? id)
+        {
+            var ProdSize = _context.ProductSize.Where(w => w.ProductId == id);
+            var ProdColor = _context.ProductColor.Where(w => w.ProductId == id);
+            var ProdImg = _context.ProductImg.Where(w => w.ProductId == id);
+
+            foreach (ProductSize ps in ProdSize)
+            {
+                _context.ProductSize.Remove(ps);
+            }
+            foreach (ProductColor pc in ProdColor)
+            {
+                _context.ProductColor.Remove(pc);
+            }
+            foreach (ProductImg pm in ProdImg)
+            {
+                var fullPathFileName = hostingEnvironment.WebRootPath + pm.ImgPath.Replace("/", "\\") + pm.ImgName;
+                if (System.IO.File.Exists(fullPathFileName))
+                {
+                    System.GC.Collect();
+                    System.GC.WaitForPendingFinalizers();
+                    System.IO.File.Delete(fullPathFileName);
+                }
+                _context.ProductImg.Remove(pm);
+            }
+        }
+        private void AddProductDetails(ProductViewModel productView, ref Product p)
+        {
+            foreach (ProductColor pc in productView.ProductColorList)
+            {
+                pc.CDT = DateTime.Now;
+                pc.MDT = DateTime.Now;
+                p.ProductColor.Add(pc);
+            }
+
+            foreach (ProductSize ps in productView.ProductSizeList)
+            {
+                ps.CDT = DateTime.Now;
+                ps.MDT = DateTime.Now;
+                p.ProductSize.Add(ps);
+            }
+
+            foreach (ProductImg pm in productView.ProductImgList)
+            {
+                string fileName = "";
+                string PathStr = "";
+                if (!SaveImage(pm.ImgName, ref fileName, ref PathStr))
+                {
+                    throw new Exception("圖片儲存失敗!");
+                }
+                ProductImg newPm = new ProductImg();
+                newPm.CDT = DateTime.Now;
+                newPm.MDT = DateTime.Now;
+                newPm.ImgName = fileName;
+                newPm.ImgPath = PathStr;
+                newPm.ProductColorId = 0;
+                p.ProductImg.Add(newPm);
+            }
+        }
+
     }
 }

@@ -200,8 +200,9 @@ function CreateProd(e) {
 
     var params = {
         Product: {
+            ProductId: ConvertInt($("#Product_ProductId").val()),
             Name: $("#Product_Name").val(),
-            Memo: $("#Product_Memo").val().replace("\n", "<br>"),
+            Memo: $("#Product_Memo").val().replace(new RegExp('\n', 'g'), '<br>'),
             Price: ConvertInt($("#Product_Price").val()),//parseInt($("#Product_Price").val()),
             Status: ConvertInt($("#Product_Status").val())//parseInt($("#Product_Status").val())
         },

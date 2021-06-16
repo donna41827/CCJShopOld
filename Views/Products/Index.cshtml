@@ -7,7 +7,11 @@
 <h4>商品列表</h4>
 
 <p>
-    <a asp-action="Create">新增</a>
+    <a asp-action="Create">新增</a>&nbsp;&nbsp;
+    @foreach (Status s in Enum.GetValues(typeof(Status)))
+    {
+        <a asp-action="Index" asp-route-Status="@Convert.ToUInt32(s)">@s.ToString()</a>
+    }
 </p>
 <div class="row align-items-start">
     @foreach (var item in Model)
@@ -15,49 +19,49 @@
         @*<a asp-action="Edit" asp-route-id="@item.Product.ProductId">Edit</a> |
             <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
             <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>*@
-    <div class="ProdView .col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-        <a asp-action="Details" asp-route-id="@item.Product.ProductId">
-            <div id="carouselExampleIndicators@(item.Product.ProductId)" class="carousel slide" data-ride="carousel" data-interval="false">
-                <ol class="carousel-indicators">
-                    @for (int i = 0; i < item.ProductImgList.Count; i++)
+        <div class="ProdView .col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+            <a asp-action="Details" asp-route-id="@item.Product.ProductId">
+                <div id="carouselExampleIndicators@(item.Product.ProductId)" class="carousel slide" data-ride="carousel" data-interval="false">
+                    <ol class="carousel-indicators">
+                        @for (int i = 0; i < item.ProductImgList.Count; i++)
+                        {
+                            <li data-target="#carouselExampleIndicators@(item.Product.ProductId)" data-slide-to="0" class="@(i == 0 ? "active" : "")"></li>
+                        }
+                    </ol>
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < item.ProductImgList.Count; i++)
+                        {
+                            <div class="img-wrap carousel-item @(i == 0 ? "active" : "") ">
+                                <img class="d-block w-100 ProdImg" src="@(item.ProductImgList[i].ImgPath)@(item.ProductImgList[i].ImgName)">
+                            </div>
+                        }
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselExampleIndicators@(item.Product.ProductId)" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleIndicators@(item.Product.ProductId)" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+                <div>@item.Product.Name</div>
+                <div>
+                    $@(item.Product.Price)
+                </div>
+                <div class="ProdColor">
+                    @foreach (var ColorItem in item.ProductColorList)
                     {
-                        <li data-target="#carouselExampleIndicators@(item.Product.ProductId)" data-slide-to="0" class="@(i == 0 ? "active" : "")"></li>
-                    }
-                </ol>
-                <div class="carousel-inner">
-                    @for (int i = 0; i < item.ProductImgList.Count; i++)
-                    {
-                        <div class="img-wrap carousel-item @(i == 0 ? "active" : "") ">
-                            <img class="d-block w-100 ProdImg" src="@(item.ProductImgList[i].ImgPath)@(item.ProductImgList[i].ImgName)">
-                        </div>
+                        <div class="ProdColorSquare" style="background-color:@(ColorItem.ColorCode)"></div>
                     }
                 </div>
-                <a class="carousel-control-prev" href="#carouselExampleIndicators@(item.Product.ProductId)" role="button" data-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                </a>
-                <a class="carousel-control-next" href="#carouselExampleIndicators@(item.Product.ProductId)" role="button" data-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
-                </a>
-            </div>
-            <div>@item.Product.Name</div>
-            <div>
-                $@(item.Product.Price)
-            </div>
-            <div class="ProdColor">
-                @foreach (var ColorItem in item.ProductColorList)
-                {
-                    <div class="ProdColorSquare" style="background-color:@(ColorItem.ColorCode)"></div>
-                }
-            </div>
-            <div>
-                @foreach (var SizeItem in item.ProductSizeList)
-                {
-                    <div class="ProdColorSquare">@(SizeItem.SizeCode)</div>
-                }
-            </div>
-        </a>
-    </div>
+                <div>
+                    @foreach (var SizeItem in item.ProductSizeList)
+                    {
+                        <div class="ProdColorSquare">@(SizeItem.SizeCode)</div>
+                    }
+                </div>
+            </a>
+        </div>
     }
 </div>

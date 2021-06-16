@@ -23,10 +23,10 @@ namespace CCJShop.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? Status)
         {
             var m = new List<ProductViewModel>();
-            foreach (var it in _context.Product.Where(w => w.Status == 1))
+            foreach (var it in _context.Product.Where(w => w.Status == (Status==null?1:Status)))
             {
                 var prodColor = _context.ProductColor.Where(w => w.ProductId == it.ProductId).ToList();
                 var prodSize = _context.ProductSize.Where(w => w.ProductId == it.ProductId).ToList();

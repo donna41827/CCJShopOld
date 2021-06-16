@@ -93,7 +93,7 @@ body {
     overflow: hidden;
 }
 
-    .img-wrap img {
+    .img-wrap img, .img-wrap vedio {
         position: absolute;
         width: 100%;
     }

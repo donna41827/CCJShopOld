@@ -196,7 +196,7 @@ function CreateProd(e) {
             }
         );
     });
-    console.log('199:' + JSON.stringify(ProductColorList));
+    //console.log('199:' + JSON.stringify(ProductColorList));
     var params = new FormData();
     params.append("VideoFile", document.getElementById("file-input").files[0]);
     var prodViewModelObj = {
@@ -215,7 +215,7 @@ function CreateProd(e) {
     params.append("FileReUpload", document.getElementById('VideoChangeFlag').value === 'true');
     let targetUrl = $(e).data("url");
     //console.log(targetUrl);
-    console.log(params);
+    //console.log(params);
     $.ajax({
         type: "POST",
         //contentType: "multipart/form-data",

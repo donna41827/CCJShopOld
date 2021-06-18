@@ -86,17 +86,22 @@ body {
     }
 /*圖片切割正方形*/
 .img-wrap {
-    position: relative;
+    /*    position: relative;
     width: 100%;
     height: 0;
     padding-bottom: 100%;
-    overflow: hidden;
+    overflow: hidden;*/
+    text-align:center;
 }
 
     .img-wrap img, .img-wrap vedio {
-        position: absolute;
-        width: 100%;
+        /*position: absolute;
+        width: 100%;*/
+        max-width:100%;
     }
+.carousel-inner {
+    border: solid 1px #dadada;
+}
 /*圖片切割正方形End*/
 .carousel-indicators li {
     border-radius: 50%;

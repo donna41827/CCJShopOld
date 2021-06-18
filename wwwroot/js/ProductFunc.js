@@ -212,6 +212,7 @@ function CreateProd(e) {
         ProductImgList: ProductImgList
     }
     params.append("ProductPostReqViewModelFormStr", JSON.stringify(prodViewModelObj));
+    params.append("FileReUpload", document.getElementById('VideoChangeFlag').value === 'true');
     let targetUrl = $(e).data("url");
     //console.log(targetUrl);
     console.log(params);
@@ -263,11 +264,13 @@ input.addEventListener('change', function () {
     const reader = new FileReader();
 
     reader.onload = function (e) {
+        video.innerHTML = "";
         video.style.display = "block";
         videoSource.setAttribute('src', e.target.result);
         video.appendChild(videoSource);
         video.load();
         video.play();
+        document.getElementById('VideoChangeFlag').value = 'true';
     };
 
     reader.onprogress = function (e) {

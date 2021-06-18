@@ -16,6 +16,7 @@
     <div class="row">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="Product.ProductId" />
+        <input type="hidden" id="VideoChangeFlag" value="false" />
         <div class="form-group col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
             <label asp-for="Product.Name" class="control-label"></label>
             <input asp-for="Product.Name" class="form-control" />
@@ -83,6 +84,21 @@
                     }
                 </output>
             </article>
+        </div>
+        <div class="form-group col-12">
+            <label class="control-label">商品影片</label>
+            <span asp-validation-for="ProductVideoList" class="text-danger"></span><br>
+            <input id="file-input" type="file" accept="video/*"><br>
+            @if (Model.ProductVideoList.Count <= 0)
+            {
+                <video id="video" width="300" height="300" controls style="display:none;"></video>
+            }
+            else
+            {
+                <video id="video" width="300" height="300" autoplay muted>
+                    <source src="@Model.ProductVideoList[0].VideoPath@Model.ProductVideoList[0].VideoName" />
+                </video>
+            }
         </div>
     </div>
     <div class="form-group align-content-start">

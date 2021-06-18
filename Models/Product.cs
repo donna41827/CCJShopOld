@@ -219,6 +219,10 @@ namespace CCJShop.Models
 		/// </summary>
 		public string ProductPostReqViewModelFormStr { get; set; }
 		/// <summary>
+		/// 影片檔案是否異動(true:異動(刪除或重新上傳,false:沒異動，不刪除原有影片資料))
+		/// </summary>
+		public bool FileReUpload { get; set; }
+		/// <summary>
 		/// 上傳影片檔案
 		/// </summary>
 		public IFormFile VideoFile { get; set; }

@@ -28,7 +28,7 @@ namespace CCJShop.Controllers
         public async Task<IActionResult> Index(int? Status)
         {
             var m = new List<ProductViewModel>();
-            foreach (var it in _context.Product.Where(w => w.Status == (Status==null?1:Status)))
+            foreach (var it in _context.Product.Where(w => w.Status == (Status == null ? 1 : Status)))
             {
                 var prodColor = _context.ProductColor.Where(w => w.ProductId == it.ProductId).ToList();
                 var prodSize = _context.ProductSize.Where(w => w.ProductId == it.ProductId).ToList();
@@ -121,37 +121,7 @@ namespace CCJShop.Controllers
                 p.ProductImg = new List<ProductImg>();
                 p.ProductVideo = new List<ProductVideo>();
 
-                AddProductDetails(productView, ref p);
-                //foreach (ProductColor pc in productView.ProductColorList)
-                //{
-                //    pc.CDT = DateTime.Now;
-                //    pc.MDT = DateTime.Now;
-                //    p.ProductColor.Add(pc);
-                //}
-
-                //foreach (ProductSize ps in productView.ProductSizeList)
-                //{
-                //    ps.CDT = DateTime.Now;
-                //    ps.MDT = DateTime.Now;
-                //    p.ProductSize.Add(ps);
-                //}
-
-                //foreach (ProductImg pm in productView.ProductImgList)
-                //{
-                //    string fileName = "";
-                //    string PathStr = "";
-                //    if (!SaveImage(pm.ImgName, ref fileName, ref PathStr))
-                //    {
-                //        throw new Exception("圖片儲存失敗!");
-                //    }
-                //    ProductImg newPm = new ProductImg();
-                //    newPm.CDT = DateTime.Now;
-                //    newPm.MDT = DateTime.Now;
-                //    newPm.ImgName = fileName;
-                //    newPm.ImgPath = PathStr;
-                //    newPm.ProductColorId = 0;
-                //    p.ProductImg.Add(newPm);
-                //}
+                AddProductDetails(productView, productViewOrg.FileReUpload, ref p);
 
                 _context.Product.Add(p);
                 await _context.SaveChangesAsync();
@@ -189,6 +159,7 @@ namespace CCJShop.Controllers
                 p.ImgName = "data:image/jpeg;base64," + ImgToBase64String(hostingEnvironment.WebRootPath + p.ImgPath + p.ImgName);
                 vm.ProductImgList.Add(p);
             }
+            vm.ProductVideoList = _context.ProductVideo.Where(w => w.ProductId == id).ToList();
             return View(vm);
         }
 
@@ -198,8 +169,11 @@ namespace CCJShop.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Obsolete]
-        public async Task<IActionResult> Edit([FromBody] ProductViewModel productView)
+        public async Task<IActionResult> Edit([FromForm] ProductPostReqViewModel productViewOrg)
         {
+            ProductViewModel productView = new ProductViewModel();
+            productView = JsonSerializer.Deserialize<ProductViewModel>(productViewOrg.ProductPostReqViewModelFormStr);
+            productView.VideoFile = productViewOrg.VideoFile;
             ReturnMsg retMsg = new ReturnMsg();
             if (!ModelState.IsValid)
             {
@@ -240,7 +214,7 @@ namespace CCJShop.Controllers
                 int id = productView.Product.ProductId;
                 Product p = _context.Product.FirstOrDefault(f => f.ProductId == id);
 
-                RemoveProductDetails(productView.Product.ProductId);
+                RemoveProductDetails(productView.Product.ProductId, productViewOrg.FileReUpload);
 
                 p.Name = productView.Product.Name;
                 p.Memo = productView.Product.Memo;
@@ -251,7 +225,8 @@ namespace CCJShop.Controllers
                 p.ProductColor = new List<ProductColor>();
                 p.ProductSize = new List<ProductSize>();
                 p.ProductImg = new List<ProductImg>();
-                AddProductDetails(productView, ref p);
+                p.ProductVideo = new List<ProductVideo>();
+                AddProductDetails(productView, productViewOrg.FileReUpload, ref p);
 
                 _context.Update(p);
 
@@ -290,7 +265,7 @@ namespace CCJShop.Controllers
 
                 retMsg.Msg = "<h5>" + product.Name + "</h5><p>$" + product.Price + "</p>";
 
-                RemoveProductDetails(id);
+                RemoveProductDetails(id, true);
 
                 _context.Product.Remove(product);
 
@@ -361,7 +336,7 @@ namespace CCJShop.Controllers
                 return false;
             }
         }
-        private bool SaveVideo(IFormFile f, ref string fileName, ref string PathStr) 
+        private bool SaveVideo(IFormFile f, ref string fileName, ref string PathStr)
         {
             bool ret = false;
             fileName = "";
@@ -379,7 +354,7 @@ namespace CCJShop.Controllers
                 PathStr = "/Video/";
                 ret = true;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 fileName = "";
                 PathStr = "";
@@ -406,11 +381,12 @@ namespace CCJShop.Controllers
                 return null;
             }
         }
-        private void RemoveProductDetails(int? id)
+        private void RemoveProductDetails(int? id, bool VideoReUpload)
         {
             var ProdSize = _context.ProductSize.Where(w => w.ProductId == id);
             var ProdColor = _context.ProductColor.Where(w => w.ProductId == id);
             var ProdImg = _context.ProductImg.Where(w => w.ProductId == id);
+            var ProdVideo = _context.ProductVideo.Where(w => w.ProductId == id);
 
             foreach (ProductSize ps in ProdSize)
             {
@@ -431,8 +407,22 @@ namespace CCJShop.Controllers
                 }
                 _context.ProductImg.Remove(pm);
             }
+            if (VideoReUpload)
+            {
+                foreach (ProductVideo pv in ProdVideo)
+                {
+                    var fullPathFileName = hostingEnvironment.WebRootPath + pv.VideoPath.Replace("/", "\\") + pv.VideoName;
+                    if (System.IO.File.Exists(fullPathFileName))
+                    {
+                        System.GC.Collect();
+                        System.GC.WaitForPendingFinalizers();
+                        System.IO.File.Delete(fullPathFileName);
+                    }
+                    _context.ProductVideo.Remove(pv);
+                }
+            }
         }
-        private void AddProductDetails(ProductViewModel productView, ref Product p)
+        private void AddProductDetails(ProductViewModel productView, bool VideoReUpload, ref Product p)
         {
             foreach (ProductColor pc in productView.ProductColorList)
             {
@@ -465,19 +455,21 @@ namespace CCJShop.Controllers
                 newPm.ProductColorId = 0;
                 p.ProductImg.Add(newPm);
             }
-
-            if (productView.VideoFile != null) 
+            if (VideoReUpload)
             {
-                if (!SaveVideo(productView.VideoFile, ref fileName, ref PathStr)) 
+                if (productView.VideoFile != null)
                 {
-                    throw new Exception("影片儲存失敗!");
+                    if (!SaveVideo(productView.VideoFile, ref fileName, ref PathStr))
+                    {
+                        throw new Exception("影片儲存失敗!");
+                    }
+                    ProductVideo newVf = new ProductVideo();
+                    newVf.CDT = DateTime.Now;
+                    newVf.MDT = DateTime.Now;
+                    newVf.VideoName = fileName;
+                    newVf.VideoPath = PathStr;
+                    p.ProductVideo.Add(newVf);
                 }
-                ProductVideo newVf = new ProductVideo();
-                newVf.CDT = DateTime.Now;
-                newVf.MDT = DateTime.Now;
-                newVf.VideoName = fileName;
-                newVf.VideoPath = PathStr;
-                p.ProductVideo.Add(newVf);
             }
         }
 

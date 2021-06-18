@@ -296,3 +296,9 @@ article {
     color:red;
 }
 /*ImgUpload End*/
+/*VideoUpload*/
+video {
+    /*border: 1px solid black;*/
+    display: block;
+}
+/*VideoUpload End*/

@@ -9,6 +9,8 @@ using CCJShop.Models;
 using System.Drawing;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace CCJShop.Controllers
 {
@@ -68,8 +70,11 @@ namespace CCJShop.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Obsolete]
-        public async Task<IActionResult> Create([FromBody] ProductViewModel productView)
+        public async Task<IActionResult> Create([FromForm] ProductPostReqViewModel productViewOrg)//[FromBody] ProductViewModel productView
         {
+            ProductViewModel productView = new ProductViewModel();
+            productView = JsonSerializer.Deserialize<ProductViewModel>(productViewOrg.ProductPostReqViewModelFormStr);
+            productView.VideoFile = productViewOrg.VideoFile;
             ReturnMsg retMsg = new ReturnMsg();
             if (!ModelState.IsValid)
             {
@@ -114,6 +119,7 @@ namespace CCJShop.Controllers
                 p.ProductColor = new List<ProductColor>();
                 p.ProductSize = new List<ProductSize>();
                 p.ProductImg = new List<ProductImg>();
+                p.ProductVideo = new List<ProductVideo>();
 
                 AddProductDetails(productView, ref p);
                 //foreach (ProductColor pc in productView.ProductColorList)
@@ -355,6 +361,32 @@ namespace CCJShop.Controllers
                 return false;
             }
         }
+        private bool SaveVideo(IFormFile f, ref string fileName, ref string PathStr) 
+        {
+            bool ret = false;
+            fileName = "";
+            PathStr = "";
+            try
+            {
+                var randomFileName = Guid.NewGuid().ToString().Substring(0, 6) + Path.GetExtension(f.FileName);
+                var fullPath = Path.Combine(hostingEnvironment.WebRootPath + "\\Video\\", randomFileName);
+
+                using (Stream fileStream = new FileStream(fullPath, FileMode.Create))
+                {
+                    f.CopyTo(fileStream);
+                }
+                fileName = randomFileName;
+                PathStr = "/Video/";
+                ret = true;
+            }
+            catch (Exception ex) 
+            {
+                fileName = "";
+                PathStr = "";
+                ret = false;
+            }
+            return ret;
+        }
         protected string ImgToBase64String(string Imagefilename)
         {
             try
@@ -416,10 +448,11 @@ namespace CCJShop.Controllers
                 p.ProductSize.Add(ps);
             }
 
+            string fileName = "";
+            string PathStr = "";
+
             foreach (ProductImg pm in productView.ProductImgList)
             {
-                string fileName = "";
-                string PathStr = "";
                 if (!SaveImage(pm.ImgName, ref fileName, ref PathStr))
                 {
                     throw new Exception("圖片儲存失敗!");
@@ -431,6 +464,20 @@ namespace CCJShop.Controllers
                 newPm.ImgPath = PathStr;
                 newPm.ProductColorId = 0;
                 p.ProductImg.Add(newPm);
+            }
+
+            if (productView.VideoFile != null) 
+            {
+                if (!SaveVideo(productView.VideoFile, ref fileName, ref PathStr)) 
+                {
+                    throw new Exception("影片儲存失敗!");
+                }
+                ProductVideo newVf = new ProductVideo();
+                newVf.CDT = DateTime.Now;
+                newVf.MDT = DateTime.Now;
+                newVf.VideoName = fileName;
+                newVf.VideoPath = PathStr;
+                p.ProductVideo.Add(newVf);
             }
         }
 

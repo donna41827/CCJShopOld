@@ -64,6 +64,9 @@ namespace CCJShop.Context
                 new ProductSize { ProductSizeId = 2, SizeCode = "M", ProductId = 2, SizeMemo = "腰圍60 裙長78" },
                 new ProductSize { ProductSizeId = 3, SizeCode = "L", ProductId = 2, SizeMemo = "腰圍63 裙長79" }
                 );
+            modelBuilder.Entity<ProductVideo>().HasData(
+                new ProductVideo { ProductVideoId = 1, ProductId = 1,  VideoPath = "/Video/", VideoName = "KNwCkIfpIP5gbfoh.mp4" }
+                );
         }
 
 
@@ -71,5 +74,6 @@ namespace CCJShop.Context
         public DbSet<ProductColor> ProductColor { get; set; }
         public DbSet<ProductSize> ProductSize { get; set; }
         public DbSet<ProductImg> ProductImg { get; set; }
+        public DbSet<ProductVideo> ProductVideo { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CCJShop.Validation;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -48,6 +49,7 @@ namespace CCJShop.Models
 		public virtual ICollection<ProductColor> ProductColor { get; set; }
 		public virtual ICollection<ProductSize> ProductSize { get; set; }
 		public virtual ICollection<ProductImg> ProductImg { get; set; }
+		public virtual ICollection<ProductVideo> ProductVideo { get; set; }
 	}
 	public class ProductColor 
 	{
@@ -150,6 +152,34 @@ namespace CCJShop.Models
 		public DateTime MDT { get; set; }
 		public virtual Product Product { get; set; }
 	}
+	public class ProductVideo
+	{
+		/// <summary>
+		/// 商品影片流水號
+		/// </summary>
+		public int ProductVideoId { get; set; }
+		/// <summary>
+		/// 商品影片檔案路徑
+		/// </summary>
+		public string VideoPath { get; set; }
+		/// <summary>
+		/// 商品影片檔案名稱
+		/// </summary>
+		public string VideoName { get; set; }
+		/// <summary>
+		/// 對應商品流水號(選取顏色顯示圖檔)
+		/// </summary>
+		public int ProductId { get; set; }
+		/// <summary>
+		/// 商品影片資料建立時間
+		/// </summary>
+		public DateTime CDT { get; set; }
+		/// <summary>
+		/// 商品影片資料最後修改時間
+		/// </summary>
+		public DateTime MDT { get; set; }
+		public virtual Product Product { get; set; }
+	}
 	public class ProductViewModel 
 	{
 		/// <summary>
@@ -160,6 +190,10 @@ namespace CCJShop.Models
 		/// 商品狀態
 		/// </summary>
 		public Status Status { get; set; }
+		/// <summary>
+		/// 上傳影片檔案
+		/// </summary>
+		public IFormFile VideoFile { get; set; }
 		/// <summary>
 		/// 商品顏色
 		/// </summary>
@@ -173,6 +207,21 @@ namespace CCJShop.Models
 		/// </summary>
 		[RequiredCollection(ErrorMessage = "至少需上傳一張圖片")]
 		public List<ProductImg> ProductImgList { get; set; }
+		/// <summary>
+		/// 商品影片
+		/// </summary>
+		public List<ProductVideo> ProductVideoList { get; set; }
+	}
+	public class ProductPostReqViewModel 
+	{
+		/// <summary>
+		/// AJAX POST其他欄位JSON字串
+		/// </summary>
+		public string ProductPostReqViewModelFormStr { get; set; }
+		/// <summary>
+		/// 上傳影片檔案
+		/// </summary>
+		public IFormFile VideoFile { get; set; }
 	}
 	/// <summary>
 	/// 商品狀態

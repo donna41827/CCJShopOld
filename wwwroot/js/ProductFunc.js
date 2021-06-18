@@ -61,13 +61,13 @@ function RemoveImgFunc(e) {
     var strChooseItemIdx = parseInt(strChooseItemId.id.split("ImgItem")[1], 10);
     var result = document.getElementById("result");
     result.removeChild(e.parentNode.parentNode);
-    console.log(strChooseItemIdx);
-    console.log(result);
+    //console.log(strChooseItemIdx);
+    //console.log(result);
     for (var i = strChooseItemIdx + 1; i <= result.childNodes.length; i++) {
-        console.log("i:" + i);
+        //console.log("i:" + i);
         document.getElementById("ImgItem" + i).id = "ImgItem" + (i - 1);
     }
-    console.log(result);
+    //console.log(result);
 }
 function FrontImgFunc(e) {
     var strChooseItemId = e.parentNode.parentNode;
@@ -196,9 +196,10 @@ function CreateProd(e) {
             }
         );
     });
-
-
-    var params = {
+    console.log('199:' + JSON.stringify(ProductColorList));
+    var params = new FormData();
+    params.append("VideoFile", document.getElementById("file-input").files[0]);
+    var prodViewModelObj = {
         Product: {
             ProductId: ConvertInt($("#Product_ProductId").val()),
             Name: $("#Product_Name").val(),
@@ -210,23 +211,28 @@ function CreateProd(e) {
         ProductSizeList: ProductSizeList,
         ProductImgList: ProductImgList
     }
+    params.append("ProductPostReqViewModelFormStr", JSON.stringify(prodViewModelObj));
     let targetUrl = $(e).data("url");
-    console.log(targetUrl);
+    //console.log(targetUrl);
+    console.log(params);
     $.ajax({
         type: "POST",
-        contentType: 'application/json',
+        //contentType: "multipart/form-data",
         url: targetUrl,
         headers: {
             RequestVerificationToken:
                 $('input:hidden[name="RequestVerificationToken"]').val()
         },
-        data: JSON.stringify(params),
-        dataType: "json",
+        data: params/*JSON.stringify(params)*/,
+        //dataType: "form-data" /*"json"*/,
+        cache: false,
+        contentType: false,
+        processData: false,
         async: true,
         success: function (response) {
-            console.log(response.ret);
+            //console.log(response.ret);
             alert(response.ret['msg']);
-            console.log(response.ret['validationItemList']);
+            //console.log(response.ret['validationItemList']);
             $("[data-valmsg-for]").empty();
             if (response.ret['success']) {
                 if (targetUrl.includes('Edit')) {
@@ -244,4 +250,31 @@ function CreateProd(e) {
         }
     });
 }
+//VideoUpload
+const input = document.getElementById('file-input');
+const video = document.getElementById('video');
+const videoSource = document.createElement('source');
+
+input.addEventListener('change', function () {
+    const files = this.files || [];
+
+    if (!files.length) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        video.style.display = "block";
+        videoSource.setAttribute('src', e.target.result);
+        video.appendChild(videoSource);
+        video.load();
+        video.play();
+    };
+
+    reader.onprogress = function (e) {
+        console.log('progress: ', Math.round((e.loaded * 100) / e.total));
+    };
+
+    reader.readAsDataURL(files[0]);
+});
+//VidoeUpload End
 //End Product

@@ -33,7 +33,8 @@ namespace CCJShop.Controllers
                 var prodColor = _context.ProductColor.Where(w => w.ProductId == it.ProductId).ToList();
                 var prodSize = _context.ProductSize.Where(w => w.ProductId == it.ProductId).ToList();
                 var prodImg = _context.ProductImg.Where(w => w.ProductId == it.ProductId).ToList();
-                m.Add(new ProductViewModel { Product = it, ProductColorList = prodColor, ProductSizeList = prodSize, ProductImgList = prodImg });
+                var prodVideo = _context.ProductVideo.Where(w => w.ProductId == it.ProductId).ToList();
+                m.Add(new ProductViewModel { Product = it, ProductColorList = prodColor, ProductSizeList = prodSize, ProductImgList = prodImg, ProductVideoList = prodVideo });
             }
             return View(m);
         }
@@ -55,6 +56,7 @@ namespace CCJShop.Controllers
             m.ProductColorList = _context.ProductColor.Where(w => w.ProductId == id).ToList();
             m.ProductSizeList = _context.ProductSize.Where(w => w.ProductId == id).ToList();
             m.ProductImgList = _context.ProductImg.Where(w => w.ProductId == id).ToList();
+            m.ProductVideoList = _context.ProductVideo.Where(w => w.ProductId == id).ToList();
             return View(m);
         }
 

@@ -26,11 +26,14 @@
                                 <img class="d-block w-100 ProdImg" src="@(Model.ProductImgList[i].ImgPath)@(Model.ProductImgList[i].ImgName)">
                             </div>
                         }
-                        <div class="img-wrap carousel-item">
-                            <video loop muted autoplay class="d-block w-100 ProdImg">
-                                <source src="/Vedio/KNwCkIfpIP5gbfoh.mp4" type="video/mp4">
-                            </video>
-                        </div>
+                        @for (int i = 0; i < Model.ProductVideoList.Count; i++)
+                        {
+                            <div class="img-wrap carousel-item">
+                                <video loop muted autoplay class="d-block w-100 ProdImg">
+                                    <source src="@(Model.ProductVideoList[i].VideoPath)@(Model.ProductVideoList[i].VideoName)" type="video/mp4">
+                                </video>
+                            </div>
+                        }
                     </div>
                     <a class="carousel-control-prev" href="#carouselExampleIndicators@(Model.Product.ProductId)" role="button" data-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>

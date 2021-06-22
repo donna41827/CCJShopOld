@@ -6,23 +6,27 @@ function ConvertInt(str) {
     var obj = parseInt(str);
     return isNaN(obj) ? 0 : obj;
 }
-window.onload = function () {
+window.addEventListener('load', function () {
     var e = document.getElementsByClassName('img-wrap');
     var imgArea = document.getElementsByClassName('carousel-inner');
-    var w = imgArea[0].clientWidth;
-    for (var i = 0; i < imgArea.length; i++) {
-        imgArea[i].setAttribute('style', 'width:' + w + 'px;height:' + w + 'px;');
+    if (imgArea.length > 0) {
+        var w = imgArea[0].clientWidth;
+        for (var i = 0; i < imgArea.length; i++) {
+            imgArea[i].setAttribute('style', 'width:' + w + 'px;height:' + w + 'px;');
+        }
+        ReSetImgWrapSize(w);
     }
-    ReSetImgWrapSize(w);
-}
-window.onresize = function () {
+});
+window.addEventListener('onresize', function () {
     var imgArea = document.getElementsByClassName('carousel-inner');
-    for (var i = 0; i < imgArea.length; i++) {
-        imgArea[i].setAttribute('style', '');
+    if (imgArea.length > 0) {
+        for (var i = 0; i < imgArea.length; i++) {
+            imgArea[i].setAttribute('style', '');
+        }
+        var w = imgArea[0].clientWidth;
+        ReSetImgWrapSize(w);
     }
-    var w = imgArea[0].clientWidth;
-    ReSetImgWrapSize(w);
-}
+});
 function ReSetImgWrapSize(w) {
     var e = document.getElementsByClassName('img-wrap');
     for (var i = 0; i < e.length; i++) {

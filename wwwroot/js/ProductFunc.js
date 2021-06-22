@@ -90,7 +90,7 @@ function FrontImgFunc(e) {
 function BackImgFunc(e) {
     var strChooseItemId = e.parentNode.parentNode;
     var strChooseItemIdx = parseInt(strChooseItemId.id.split("ImgItem")[1], 10);
-    if (strChooseItemIdx == document.getElementById("result").childNodes.length - 1) {
+    if (strChooseItemIdx == document.getElementById("result").querySelectorAll("img").length) {
         alert("已經排在最後面囉!");
         return;
     }
@@ -116,8 +116,7 @@ function SortElementById(strParentId) {
 }
 
 
-window.onload = function () {
-
+window.addEventListener('load', function () {
     //Check File API support
     if (window.File && window.FileList && window.FileReader) {
         var filesInput = document.getElementById("files");
@@ -145,7 +144,7 @@ window.onload = function () {
                     strDivImgFunc += "<input type='button' class='btn btn-link SortFront' value='排序往後' onclick='BackImgFunc(this)' />";
                     strDivImgFunc += "<input type='button' class='btn btn-link RemoveImg' value='刪除' onclick='RemoveImgFunc(this)' /></div>";
                     div.innerHTML = "<img name='ImgItemTag' class='thumbnail' src='" + picFile.result + "'" + "title='" + picFile.name + "'/>" + strDivImgFunc;
-                    div.id = "ImgItem" + output.childNodes.length;
+                    div.id = "ImgItem" + (output.querySelectorAll('img').length + 1);
 
                     output.insertBefore(div, null);
 
@@ -160,7 +159,7 @@ window.onload = function () {
     else {
         console.log("Your browser does not support File API");
     }
-}
+});
 
 //商品新增
 function CreateProd(e) {
@@ -279,5 +278,12 @@ input.addEventListener('change', function () {
 
     reader.readAsDataURL(files[0]);
 });
+
+function RemoveVideoFunc() {
+    input.files.empty;
+    video.innerHTML = "";
+    video.style.display = "none";
+    document.getElementById('VideoChangeFlag').value = 'true';
+}
 //VidoeUpload End
 //End Product

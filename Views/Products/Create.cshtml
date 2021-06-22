@@ -72,6 +72,7 @@
         </div>
         <div class="form-group col-12">
             <label class="control-label">商品影片</label>
+            <input type="button" class="btn btn-link RemoveImg" value="刪除" onclick="RemoveVideoFunc()">
             <span asp-validation-for="ProductVideoList" class="text-danger"></span><br>
             <input id="file-input" type="file" accept="video/*"><br>
             <video id="video" width="300" height="300" controls muted style="display:none;"></video>

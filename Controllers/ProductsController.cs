@@ -11,6 +11,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CCJShop.Controllers
 {
@@ -76,6 +77,7 @@ namespace CCJShop.Controllers
         {
             ProductViewModel productView = new ProductViewModel();
             productView = JsonSerializer.Deserialize<ProductViewModel>(productViewOrg.ProductPostReqViewModelFormStr);
+            TryValidateModel(productView);
             productView.VideoFile = productViewOrg.VideoFile;
             ReturnMsg retMsg = new ReturnMsg();
             if (!ModelState.IsValid)

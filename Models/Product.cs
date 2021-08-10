@@ -135,6 +135,10 @@ namespace CCJShop.Models
 		/// </summary>
 		public string ImgName { get; set; }
 		/// <summary>
+		/// 圖片順序
+		/// </summary>
+		public int ImgSeq { get; set; }
+		/// <summary>
 		/// 對應商品流水號(選取顏色顯示圖檔)
 		/// </summary>
 		public int ProductId { get; set; }

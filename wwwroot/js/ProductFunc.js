@@ -187,14 +187,29 @@ function CreateProd(e) {
         );
     });
 
+    //var ProductImgList = new Array();
+    //document.getElementsByName("ImgItemTag").forEach(function (elem) {
+    //    console.log('Edit192-->');
+    //    //console.log(elem.src);
+    //    ProductImgList.push(
+    //        {
+    //            ImgName: elem.src
+    //        }
+    //    );
+    //    //alert('Edit192End--' + elem.childNodes.id);
+    //});
     var ProductImgList = new Array();
-    document.getElementsByName("ImgItemTag").forEach(function (elem) {
+    var ProdImgLen = document.getElementById('result').querySelectorAll("div .thumbnail").length;
+    for (var i = 0; i < ProdImgLen; i++)
+    {
         ProductImgList.push(
             {
-                ImgName: elem.src
+                ImgName: document.getElementById('ImgItem' + (i + 1)).querySelector("img").src,
+                ImgSeq: i + 1
             }
         );
-    });
+    }
+
     //console.log('199:' + JSON.stringify(ProductColorList));
     var params = new FormData();
     params.append("VideoFile", document.getElementById("file-input").files[0]);

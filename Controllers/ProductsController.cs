@@ -33,7 +33,7 @@ namespace CCJShop.Controllers
             {
                 var prodColor = _context.ProductColor.Where(w => w.ProductId == it.ProductId).ToList();
                 var prodSize = _context.ProductSize.Where(w => w.ProductId == it.ProductId).ToList();
-                var prodImg = _context.ProductImg.Where(w => w.ProductId == it.ProductId).ToList();
+                var prodImg = _context.ProductImg.Where(w => w.ProductId == it.ProductId).OrderBy(o => o.ImgSeq).ToList();
                 var prodVideo = _context.ProductVideo.Where(w => w.ProductId == it.ProductId).ToList();
                 m.Add(new ProductViewModel { Product = it, ProductColorList = prodColor, ProductSizeList = prodSize, ProductImgList = prodImg, ProductVideoList = prodVideo });
             }
@@ -56,7 +56,7 @@ namespace CCJShop.Controllers
             m.Product = product;
             m.ProductColorList = _context.ProductColor.Where(w => w.ProductId == id).ToList();
             m.ProductSizeList = _context.ProductSize.Where(w => w.ProductId == id).ToList();
-            m.ProductImgList = _context.ProductImg.Where(w => w.ProductId == id).ToList();
+            m.ProductImgList = _context.ProductImg.Where(w => w.ProductId == id).OrderBy(o => o.ImgSeq).ToList();
             m.ProductVideoList = _context.ProductVideo.Where(w => w.ProductId == id).ToList();
             return View(m);
         }
@@ -158,7 +158,7 @@ namespace CCJShop.Controllers
             vm.ProductColorList = _context.ProductColor.Where(w => w.ProductId == id).ToList();
             vm.ProductSizeList = _context.ProductSize.Where(w => w.ProductId == id).ToList();
             vm.ProductImgList = new List<ProductImg>();
-            foreach (ProductImg p in _context.ProductImg.Where(w => w.ProductId == id).ToList())
+            foreach (ProductImg p in _context.ProductImg.Where(w => w.ProductId == id).OrderBy(o => o.ImgSeq).ToList())
             {
                 p.ImgName = "data:image/jpeg;base64," + ImgToBase64String(hostingEnvironment.WebRootPath + p.ImgPath + p.ImgName);
                 vm.ProductImgList.Add(p);
@@ -457,6 +457,7 @@ namespace CCJShop.Controllers
                 newPm.ImgName = fileName;
                 newPm.ImgPath = PathStr;
                 newPm.ProductColorId = 0;
+                newPm.ImgSeq = pm.ImgSeq;
                 p.ProductImg.Add(newPm);
             }
             if (VideoReUpload)
